@@ -1,2 +1,3 @@
-1 mutoni bk 5289383 mutoni 1994
-2 egide equity 1930886 egide 910
+2,mutoni,bk,1930886,434,0
+3,best,equity,5289383,best,0
+4,loraine,bk,8692777,loraine,0
