@@ -1,3 +1,5 @@
-2,mutoni,bk,1930886,434,0
-3,best,equity,5289383,best,0
-4,loraine,bk,8692777,loraine,0
+3,best,equity,5289383,best,97
+4,loraine,bk,8692777,loraine,2
+5,loraine,bk,8692777,loraine,4
+6,loraine,bk,8692777,loraine,3
+7,loraine,bk,8692777,loraine,90

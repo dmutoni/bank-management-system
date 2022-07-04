@@ -99,7 +99,6 @@ void save_account()
     account.account_number = generate_account_number();
     account.balance = 0;
     account_file << account.account_id << "," << account.account_name << "," << account.bank_name << "," << account.account_number << "," << account.username << "," << account.balance << endl;
-
     cout << "Account created successfully!" << endl;
     cout << "Account ID: " << account.account_id << endl;
     cout << "Account Number: " << account.account_number << endl;
@@ -166,47 +165,43 @@ void delete_account(int account_number)
 
 int increase_balance(int account_number, int amount)
 {
-    ofstream temp_file("temp.txt", ios::out | ios::app);
-    ifstream account_file("account.txt", ios::in);
     Account account;
 
     int total_balance;
 
-    while (account_file >> account.account_id >> account.account_name >> account.bank_name >> account.account_number >> account.username >> account.balance)
+    vector<Account> accounts = get_all_accounts();
+
+    for (int i = 0; i < accounts.size(); i++)
     {
+        Account account = accounts[i];
         if (account.account_number == account_number)
         {
-            total_balance = account.balance += amount;
+            total_balance = accounts[i].balance += amount;
         }
-        temp_file << account.account_id << "," << account.account_name << "," << account.bank_name << "," << account.account_number << "," << account.username << "," << account.balance << endl;
     }
-    remove("account.txt");
-    rename("temp.txt", "account.txt");
-    account_file.close();
-    temp_file.close();
+    update_to_file_from_vector(accounts);
+
     return total_balance;
 }
 
 int decrease_balance(int account_number, int amount)
 {
-    ofstream temp_file("temp.txt", ios::out | ios::app);
-    ifstream account_file("account.txt", ios::in);
     Account account;
 
     int total_balance;
 
-    while (account_file >> account.account_id >> account.account_name >> account.bank_name >> account.account_number >> account.username >> account.balance)
+    vector<Account> accounts = get_all_accounts();
+
+    for (int i = 0; i < accounts.size(); i++)
     {
+        Account account = accounts[i];
         if (account.account_number == account_number)
         {
-            total_balance = account.balance -= amount;
+            total_balance = accounts[i].balance -= amount;
         }
-        temp_file << account.account_id << "," << account.account_name << "," << account.bank_name << "," << account.account_number << "," << account.username << "," << account.balance << endl;
     }
-    remove("account.txt");
-    rename("temp.txt", "account.txt");
-    account_file.close();
-    temp_file.close();
+    update_to_file_from_vector(accounts);
+
     return total_balance;
 }
 
@@ -236,10 +231,13 @@ int deposit()
 
 bool isAmountAvailable(int account_number, int amount)
 {
-    ifstream account_file("account.txt", ios::in);
-    Account account;
-    while (account_file >> account.account_id >> account.account_name >> account.bank_name >> account.account_number >> account.username >> account.balance)
+    int total_balance;
+
+    vector<Account> accounts = get_all_accounts();
+
+    for (int i = 0; i < accounts.size(); i++)
     {
+        Account account = accounts[i];
         if (account.account_number == account_number)
         {
             if (account.balance >= amount)
@@ -248,7 +246,7 @@ bool isAmountAvailable(int account_number, int amount)
             }
         }
     }
-    account_file.close();
+
     return false;
 }
 
@@ -280,32 +278,16 @@ int withdraw()
 
     int total_balance = 0;
 
-    ifstream account_file("account.txt", ios::in);
-    ofstream temp_file("temp.txt", ios::out | ios::app);
+    vector<Account> accounts = get_all_accounts();
 
     Account account;
 
-    while (account_file >> account.account_id >> account.account_name >> account.bank_name >> account.account_number >> account.username >> account.balance)
-    {
-        if (account.account_number == account_number)
-        {
-            account.balance -= amount;
-            if (amount > 10000 && amount < 50000)
-                account.balance -= amount * 0.02;
-            else if (amount <= 100000)
-                account.balance -= amount * 0.03;
-            total_balance = account.balance;
-            temp_file << account.account_id << "," << account.account_name << "," << account.bank_name << "," << account.account_number << "," << account.username << "," << account.balance << endl;
-        }
-        else
-        {
-            temp_file << account.account_id << "," << account.account_name << "," << account.bank_name << "," << account.account_number << "," << account.username << "," << account.balance << endl;
-        }
-    }
-    remove("account.txt");
-    rename("temp.txt", "account.txt");
-    account_file.close();
-    temp_file.close();
+    if (amount > 10000 && amount < 50000)
+        total_balance = decrease_balance(account_number, (amount + amount * 0.02));
+    else if (amount <= 100000)
+        total_balance = decrease_balance(account_number, (amount + amount * 0.04));
+    else
+        total_balance = decrease_balance(account_number, amount);
 
     return total_balance;
 }
@@ -315,11 +297,11 @@ void display()
     ifstream account_file("account.txt", ios::in);
     Account account;
 
-    cout << "Account ID" << setw(5) << ","
-         << "Account Name" << setw(5) << ","
-         << "Bank Name" << setw(5) << ","
-         << "Account Number" << setw(5) << ","
-         << "Username" << setw(5) << ","
+    cout << "Account ID" << setw(5) << " "
+         << "Account Name" << setw(5) << " "
+         << "Bank Name" << setw(5) << " "
+         << "Account Number" << setw(5) << " "
+         << "Username" << setw(5) << " "
          << "Balance" << endl;
 
     while (account_file >> account.account_id >> account.account_name >> account.bank_name >> account.account_number >> account.username >> account.balance)
@@ -346,9 +328,31 @@ int transfer_money(int senders_account, int receiver_account, int amount)
     return remaining_balance;
 }
 
-void sort_by_input(int balance)
+void sorting_accounts_by_input()
 {
-    // read in file
-    // as you read push account objects to a vector
-    // perform bubble sort
+    vector<Account> accounts = get_all_accounts();
+
+    for (int step = 0; step < (accounts.size() - 1); ++step)
+    {
+
+        int swapped = 0;
+
+        for (int i = 0; i < (accounts.size() - step - 1); ++i)
+        {
+
+            if (accounts[i].balance < accounts[i + 1].balance)
+            {
+
+                Account temp = accounts[i];
+                accounts[i] = accounts[i + 1];
+                accounts[i + 1] = temp;
+
+                swapped = 1;
+            }
+        }
+        if (swapped == 0)
+            break;
+    }
+
+    print_accounts(accounts);
 }

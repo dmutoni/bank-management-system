@@ -24,6 +24,8 @@ int main()
         cout << "7. Withdraw" << endl;
         cout << "8. Display" << endl;
         cout << "9. Transfer money" << endl;
+        cout << "10. Sort money" << endl;
+
         cin >> choice;
         switch (choice)
         {
@@ -64,13 +66,13 @@ int main()
         case 6:
         {
             int total_balance = deposit();
-            cout << "Total balance: " << total_balance << endl;
+            cout << "Your new balance: " << total_balance << endl;
             break;
         }
         case 7:
         {
             int total_balance = withdraw();
-            cout << "Total balance: " << total_balance << endl;
+            cout << "Your new balance: " << total_balance << endl;
             break;
         }
         case 8:
@@ -108,6 +110,9 @@ int main()
             cout << "Your remaining balance is " << remaining_money << endl;
         }
         break;
+        case 10:
+            sorting_accounts_by_input();
+            break;
         default:
             cout << "Invalid choice" << endl;
             break;
