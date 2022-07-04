@@ -1,2 +1,2 @@
-1 mutoni bk 5289383 mutoni 0
-2 mutoni bk 1930886 dmutoni 230
+1 mutoni bk 5289383 mutoni 1000
+2 egide equity 1930886 egide 500
