@@ -173,6 +173,26 @@ int increase_balance (int account_number, int amount) {
     return total_balance;
 }
 
+int decrease_balance (int account_number, int amount) {
+    ofstream temp_file("temp.txt", ios::out | ios::app);
+    ifstream account_file("account.txt", ios::in);
+    Account account;
+
+    int total_balance;
+
+    while(account_file >> account.account_id >> account.account_name >> account.bank_name >> account.account_number >> account.username >> account.balance) {
+        if (account.account_number == account_number) {
+            total_balance = account.balance -= amount;
+        }
+        temp_file << account.account_id << " " << account.account_name << " " << account.bank_name << " " << account.account_number << " " << account.username << " " << account.balance << endl;
+    }
+    remove("account.txt");
+    rename("temp.txt", "account.txt");
+    account_file.close();
+    temp_file.close();
+    return total_balance;
+}
+
 int deposit() {
     int account_number, amount;
     cout << "Enter account number : " << endl;
@@ -191,7 +211,21 @@ int deposit() {
         deposit();    
     }
   
-    return  increase_balance(account_number, amount);
+    return increase_balance(account_number, amount);
+}
+
+bool isAmountAvailable(int account_number, int amount) {
+    ofstream temp_file("temp.txt", ios::out | ios::app);
+    ifstream account_file("account.txt", ios::in);
+    Account account;
+    while (account_file >> account.account_id >> account.bank_name >> account.account_name >> account.username >> account.balance) {
+        if (account.account_number == account_number && account.balance >= amount) {
+            return true;
+        } 
+    }
+    temp_file.close();
+    account_file.close();
+    return false;
 }
 
 
@@ -208,7 +242,7 @@ int withdraw() {
     cout << "Enter amount to withdraw : " << endl;
     cin >> amount;
 
-    if (amount>=0) {
+    if (amount <= 0) {
         cout << "Amount must be greater than zero" << endl;
         withdraw();    
     } else if( amount > 200000 ) {
@@ -226,7 +260,10 @@ int withdraw() {
 
     while (account_file >> account.account_id >> account.account_name >> account.bank_name >> account.account_number >> account.username >> account.balance) {
         if (account.account_number == account_number) {
-            total_balance = account.balance -= amount;
+            account.balance -= amount;
+            if( amount > 10000  && amount < 50000 ) account.balance -= amount * 0.02;
+            else if( amount <= 100000 ) account.balance -= amount * 0.03;
+            total_balance = account.balance;
             temp_file << account.account_id << " " << account.account_name << " " << account.bank_name << " " << account.account_number << " " << account.username << " " << account.balance << endl;
         } else {
             temp_file << account.account_id << " " << account.account_name << " " << account.bank_name << " " << account.account_number << " " << account.username << " " << account.balance << endl;
@@ -236,9 +273,6 @@ int withdraw() {
     rename("temp.txt", "account.txt");
     account_file.close();
     temp_file.close();
-
-    if( amount > 10000  && amount < 50000 ) total_balance -= total_balance * 0.02;
-    else if( amount <= 100000 ) total_balance -= total_balance * 0.03;
 
     return total_balance;
 }
@@ -266,12 +300,30 @@ void display() {
     account_file.close();
 }
 
-void send_money() {
+int transfer_money(int senders_account, int receiver_account, int amount) {
   // check if the sender's account number and receivers account number exists
   // if yes, check if the sender's account has that money
   // if yes, deposit on the receiver's account
     // if no, return -1
-    
+    if (!account_number_exists(senders_account)) {
+        cout << "Sorry, this account does not exist";
+        transfer_money(senders_account, receiver_account, amount);
+    }
+    if (!account_number_exists(receiver_account)) {
+        cout << "Sorry, this account does not exist";
+        transfer_money(senders_account, receiver_account, amount);
+    }
+    if(!isAmountAvailable(senders_account, amount)) {
+        cout << "Sorry, this account does not exist";
+        transfer_money(senders_account, receiver_account, amount);
+    }
+    int remaining_balance = decrease_balance(senders_account, amount);
+    increase_balance(receiver_account, amount);
+    return remaining_balance;
 }
+
+
+
+
 
 

@@ -21,6 +21,7 @@ int main () {
         cout << "6. Deposit" << endl;
         cout << "7. Withdraw" << endl;
         cout << "8. Display" << endl;
+        cout << "9. Transfer money" << endl;
         cin >> choice;
         switch (choice) {
             case 1:
@@ -50,6 +51,19 @@ int main () {
             }
             case 8: 
                 display();
+                break;
+            case 9: {
+                int senders_account, receiver_account, amount;
+                cout << "Enter sender's account number: " << endl;
+                cin >> senders_account;
+                cout << "Enter receiver's account number: " << endl;
+                cin >> receiver_account;
+                cout << "Enter amount to transfer: " << endl;
+                cin >> amount;
+                int remaining_money = transfer_money(senders_account, receiver_account, amount);
+                cout << "Successfully transfered money to " << receiver_account << endl;
+                cout << "Your remaining balance is " << remaining_money << endl;
+            }
                 break;
             default:
                 cout << "Invalid choice" << endl;
