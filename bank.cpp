@@ -54,12 +54,24 @@ int main () {
                 break;
             case 9: {
                 int senders_account, receiver_account, amount;
-                cout << "Enter sender's account number: " << endl;
+                sender: cout << "Enter sender's account number: " << endl;
                 cin >> senders_account;
-                cout << "Enter receiver's account number: " << endl;
+                if (!account_number_exists(senders_account)) {
+                    cout << "Sorry, this sender's account does not exist";
+                    goto sender;
+                }
+                receiver: cout << "Enter receiver's account number: " << endl;
                 cin >> receiver_account;
-                cout << "Enter amount to transfer: " << endl;
+                if (!account_number_exists(receiver_account)) {
+                    cout << "Sorry, this receiver's account does not exist" << endl;
+                    goto receiver;
+                }
+                amount: cout << "Enter amount to transfer: " << endl;
                 cin >> amount;
+                if(!isAmountAvailable(senders_account, amount)) {
+                    cout << "Sorry, this amount is not available on your account" << endl;
+                    goto amount;
+                }
                 int remaining_money = transfer_money(senders_account, receiver_account, amount);
                 cout << "Successfully transfered money to " << receiver_account << endl;
                 cout << "Your remaining balance is " << remaining_money << endl;

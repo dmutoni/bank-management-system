@@ -215,15 +215,15 @@ int deposit() {
 }
 
 bool isAmountAvailable(int account_number, int amount) {
-    ofstream temp_file("temp.txt", ios::out | ios::app);
     ifstream account_file("account.txt", ios::in);
-    Account account;
-    while (account_file >> account.account_id >> account.bank_name >> account.account_name >> account.username >> account.balance) {
-        if (account.account_number == account_number && account.balance >= amount) {
+    Account account;    
+    while (account_file >> account.account_id >> account.account_name >> account.bank_name >> account.account_number >> account.username >> account.balance) {
+        if (account.account_number == account_number) {
+            if( account.balance >= amount) {
             return true;
+            }
         } 
     }
-    temp_file.close();
     account_file.close();
     return false;
 }
@@ -305,18 +305,8 @@ int transfer_money(int senders_account, int receiver_account, int amount) {
   // if yes, check if the sender's account has that money
   // if yes, deposit on the receiver's account
     // if no, return -1
-    if (!account_number_exists(senders_account)) {
-        cout << "Sorry, this account does not exist";
-        transfer_money(senders_account, receiver_account, amount);
-    }
-    if (!account_number_exists(receiver_account)) {
-        cout << "Sorry, this account does not exist";
-        transfer_money(senders_account, receiver_account, amount);
-    }
-    if(!isAmountAvailable(senders_account, amount)) {
-        cout << "Sorry, this account does not exist";
-        transfer_money(senders_account, receiver_account, amount);
-    }
+   
+   
     int remaining_balance = decrease_balance(senders_account, amount);
     increase_balance(receiver_account, amount);
     return remaining_balance;
